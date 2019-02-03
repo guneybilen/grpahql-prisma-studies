@@ -35,7 +35,7 @@ import "cross-fetch/polyfill";
 // you need the following gql library when working with ApolloBoost from the browser
 import { gql } from "apollo-boost"; // this import needs cross-fetch/polyfill
 import prisma from "../src/prisma";
-import seedDatabase from "./utils/seedDatabase";
+import seedDatabase, { userOne } from "./utils/seedDatabase";
 import getClient from "./utils/getClient";
 
 const client = getClient();
@@ -73,7 +73,7 @@ test("should create a new user", async () => {
 
   // prisma.exists return a promise requires await in front of expect
   // and async up top before function. (i.e. async () => )
-  //await expect(
+  // await expect(
   //  prisma.exists.User({ id: response.data.createUser.user.id })
   //).resolves.toBe(true);
 });
@@ -103,6 +103,9 @@ test("should not login with bad credentials", async () => {
     }
   `;
 
+  // In the video Andrew Mead used the no-parameter version .toThrow()
+  // but it did not work for me. I found the parametered one from
+  // jest expect page.
   //await expect(client.mutate({ mutation: login })).rejects.toThrow();
   await expect(client.mutate({ mutation: login })).rejects.toThrow(
     "Unable to login"
@@ -125,4 +128,21 @@ test("should not signup user with invalid password", async () => {
   await expect(client.mutate({ mutation: createUser })).rejects.toThrow(
     "Password must be 8 characters or longer."
   );
+});
+
+test("should fetch user profile", async () => {
+  const client = getClient(userOne.jwt);
+  const getProfile = gql`
+    query {
+      me {
+        id
+        name
+        email
+      }
+    }
+  `;
+  const { data } = await client.query({ query: getProfile });
+  expect(data.me.id).toBe(userOne.user.id);
+  expect(data.me.name).toBe(userOne.user.name);
+  expect(data.me.email).toBe(userOne.user.email);
 });
