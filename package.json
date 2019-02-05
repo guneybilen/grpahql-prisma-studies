@@ -13,15 +13,15 @@
     "get-schema": "graphql get-schema -p prisma --dotenv config/dev.env"
   },
   "jest": {
-    "globalSetup": "./tests/jest/globalSetup.js",
-    "globalTeardown": "./tests/jest/globalTeardown.js",
-    "rootDir": "./",
+    "globalSetup": "./jest/globalSetup.js",
+    "globalTeardown": "./jest/globalTeardown.js",
+    "rootDir": "tests/",
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "/dist/",
       "/.git/"
     ],
-    "testRegex": "/tests/.*.test.(js|ts|tsx)?$",
+    "testRegex": "./.*.test.(js|ts|tsx)?$",
     "testEnvironment": "node",
     "bail": true
   },
