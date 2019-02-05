@@ -1,3 +1,4 @@
+import "@babel/polyfill/noConflict";
 import jwt from "jsonwebtoken";
 
 const getUserid = (request, requireAuth = true) => {
