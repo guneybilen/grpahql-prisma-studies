@@ -13,7 +13,12 @@ import {
 } from "./utils/operations";
 const client = getClient();
 
-beforeEach(seedDatabase);
+//beforeEach(seedDatabase);
+
+beforeEach(async () => {
+  await seedDatabase();
+  await jest.setTimeout(1000000);
+});
 
 test("should expose published public posts", async () => {
   const response = await client.query({ query: getPosts });

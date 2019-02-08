@@ -1,0 +1,4 @@
+
+RUN ALL TESTS ONE BY ONE LIKE:
+
+npm run test post.test.js

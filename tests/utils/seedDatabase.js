@@ -12,6 +12,16 @@ const userOne = {
   jwt: undefined
 };
 
+const userTwo = {
+  input: {
+    name: "Sarah",
+    email: "sarah@example.com",
+    password: bcrypt.hashSync("fed098!@#$")
+  },
+  user: undefined,
+  jwt: undefined
+};
+
 const postOne = {
   input: {
     title: "My published post",
@@ -30,10 +40,25 @@ const postTwo = {
   post: undefined
 };
 
+const commentOne = {
+  input: {
+    text: "Comment by Sarah"
+  },
+  comment: undefined
+};
+
+const commentTwo = {
+  input: {
+    text: "Comment by Jen"
+  },
+  comment: undefined
+};
+
 const seedDatabase = async () => {
-  jest.setTimeout(10000); // jest.setTimeout(10000); should be in a before hook
+  jest.setTimeout(100000); // jest.setTimeout(10000); should be in a before hook
 
   // delete test data
+  await prisma.mutation.deleteManyComments();
   await prisma.mutation.deleteManyPosts();
   await prisma.mutation.deleteManyUsers();
 
@@ -43,6 +68,12 @@ const seedDatabase = async () => {
   });
 
   userOne.jwt = jwt.sign({ userId: userOne.user.id }, process.env.JWT_SECRET);
+
+  userTwo.user = await prisma.mutation.createUser({
+    data: userTwo.input
+  });
+
+  userTwo.jwt = jwt.sign({ userId: userTwo.user.id }, process.env.JWT_SECRET);
 
   // create post one
   postOne.post = await prisma.mutation.createPost({
@@ -67,6 +98,46 @@ const seedDatabase = async () => {
       }
     }
   });
+
+  commentOne.comment = await prisma.mutation.createComment({
+    data: {
+      ...commentOne.input,
+      author: {
+        connect: {
+          id: userTwo.user.id
+        }
+      },
+      post: {
+        connect: {
+          id: postOne.post.id
+        }
+      }
+    }
+  });
+
+  commentTwo.comment = await prisma.mutation.createComment({
+    data: {
+      ...commentTwo.input,
+      author: {
+        connect: {
+          id: userOne.user.id
+        }
+      },
+      post: {
+        connect: {
+          id: postOne.post.id
+        }
+      }
+    }
+  });
 };
 
-export { seedDatabase as default, userOne, postOne, postTwo };
+export {
+  seedDatabase as default,
+  userOne,
+  userTwo,
+  postOne,
+  postTwo,
+  commentOne,
+  commentTwo
+};
